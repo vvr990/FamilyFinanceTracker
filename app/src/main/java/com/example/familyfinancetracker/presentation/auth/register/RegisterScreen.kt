@@ -1,21 +1,33 @@
 package com.example.familyfinancetracker.presentation.auth
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.familyfinancetracker.data.remote.FirebaseAuthSource
 
 @Composable
 fun RegisterScreen(
-    onRegisterClick: () -> Unit
+    onRegisterSuccess: () -> Unit
 ) {
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    var message by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -61,10 +73,48 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = onRegisterClick,
+            onClick = {
+
+                if (name.isBlank() || email.isBlank() || password.isBlank()) {
+                    message = "Please fill all fields"
+                    return@Button
+                }
+
+                if (password.length < 6) {
+                    message = "Password must be at least 6 characters"
+                    return@Button
+                }
+
+                FirebaseAuthSource.registerUser(
+                    email = email,
+                    password = password,
+                    onSuccess = {
+
+                        message = "Registration Successful"
+
+                        name = ""
+                        email = ""
+                        password = ""
+
+                        onRegisterSuccess()
+                    },
+                    onError = {
+                        message = it
+                    }
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Register")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (message.isNotEmpty()) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

@@ -5,13 +5,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
 import com.example.familyfinancetracker.data.model.FamilyMember
-
-import androidx.compose.material3.TextButton
-
 
 @Composable
 fun FamilyMembersScreen() {
@@ -25,138 +22,158 @@ fun FamilyMembersScreen() {
         mutableStateListOf<FamilyMember>()
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .statusBarsPadding()
+            .padding(horizontal = 24.dp)
     ) {
 
-        Text(
-            text = "Family Members",
-            style = MaterialTheme.typography.headlineSmall
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = age,
-            onValueChange = { age = it },
-            label = { Text("Age") }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = relation,
-            onValueChange = { relation = it },
-            label = { Text("Relation") }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = contribution,
-            onValueChange = { contribution = it },
-            label = { Text("Monthly Contribution") }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-
-                if (
-                    name.isBlank() ||
-                    age.isBlank() ||
-                    relation.isBlank() ||
-                    contribution.isBlank()
-                ) {
-                    return@Button
-                }
-
-                members.add(
-                    FamilyMember(
-                        id = members.size + 1,
-                        name = name,
-                        age = age,
-                        relation = relation,
-                        contribution = contribution
-                    )
-                )
-
-                name = ""
-                age = ""
-                relation = ""
-                contribution = ""
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Add Member")
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Family Members",
+                style = MaterialTheme.typography.headlineMedium
+            )
 
-        val totalContribution = members.sumOf {
-            it.contribution.toIntOrNull() ?: 0
-        }
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = "Total Contribution: ₹$totalContribution",
-            style = MaterialTheme.typography.titleMedium
-        )
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(
-            modifier = Modifier.height(12.dp)
-        )
+            Spacer(modifier = Modifier.height(12.dp))
 
-        LazyColumn {
+            OutlinedTextField(
+                value = age,
+                onValueChange = { age = it },
+                label = { Text("Age") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-            items(members) { member ->
+            Spacer(modifier = Modifier.height(12.dp))
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+            OutlinedTextField(
+                value = relation,
+                onValueChange = { relation = it },
+                label = { Text("Relation") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = contribution,
+                onValueChange = { contribution = it },
+                label = { Text("Monthly Contribution") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = {
+
+                    if (
+                        name.isBlank() ||
+                        age.isBlank() ||
+                        relation.isBlank() ||
+                        contribution.isBlank()
+                    ) {
+                        return@Button
+                    }
+
+                    members.add(
+                        FamilyMember(
+                            id = members.size + 1,
+                            name = name,
+                            age = age,
+                            relation = relation,
+                            contribution = contribution
+                        )
+                    )
+
+                    name = ""
+                    age = ""
+                    relation = ""
+                    contribution = ""
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Add Member")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val totalContribution = members.sumOf {
+                it.contribution.toIntOrNull() ?: 0
+            }
+
+            Text(
+                text = "Total Contribution: ₹$totalContribution",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (members.isNotEmpty()) {
+
+                LazyColumn(
+                    modifier = Modifier.height(250.dp)
                 ) {
 
-                    Column(
-                        modifier = Modifier.padding(12.dp)
-                    ) {
+                    items(members) { member ->
 
-                        Text("Name: ${member.name}")
-                        Text("Age: ${member.age}")
-                        Text("Relation: ${member.relation}")
-                        Text("Contribution: ₹${member.contribution}")
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        TextButton(
-                            onClick = {
-                                members.remove(member)
-                            }
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp)
                         ) {
-                            Text("Delete")
-                        }
 
-                        TextButton(
-                            onClick = {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
 
-                                name = member.name
-                                age = member.age
-                                relation = member.relation
-                                contribution = member.contribution
+                                Text("Name: ${member.name}")
+                                Text("Age: ${member.age}")
+                                Text("Relation: ${member.relation}")
+                                Text("Contribution: ₹${member.contribution}")
 
-                                members.remove(member)
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row {
+
+                                    TextButton(
+                                        onClick = {
+                                            members.remove(member)
+                                        }
+                                    ) {
+                                        Text("Delete")
+                                    }
+
+                                    TextButton(
+                                        onClick = {
+
+                                            name = member.name
+                                            age = member.age
+                                            relation = member.relation
+                                            contribution = member.contribution
+
+                                            members.remove(member)
+                                        }
+                                    ) {
+                                        Text("Edit")
+                                    }
+                                }
                             }
-                        ) {
-                            Text("Edit")
                         }
                     }
                 }

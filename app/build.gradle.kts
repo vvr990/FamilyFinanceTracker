@@ -3,7 +3,8 @@ plugins {
 //        alias(libs.plugins.kotlin.android)
         alias(libs.plugins.kotlin.compose)
 //        alias(libs.plugins.ksp)
-    }
+        id("com.google.gms.google-services")
+}
 
 android {
     namespace = "com.example.familyfinancetracker"
@@ -45,6 +46,12 @@ dependencies {
 //    implementation(libs.room.runtime)
 //    implementation(libs.room.ktx)
 //    ksp(libs.room.compiler)
+
+    implementation("com.google.firebase:firebase-auth:24.0.1")
+
+    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+
+    implementation("com.google.firebase:firebase-auth")
 
     implementation("androidx.compose.material:material-icons-extended")
     implementation(platform(libs.androidx.compose.bom))

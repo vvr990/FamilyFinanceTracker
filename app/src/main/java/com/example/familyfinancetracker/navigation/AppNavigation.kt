@@ -38,9 +38,8 @@ fun AppNavigation() {
         }
 
         composable(Screen.Register.route) {
-
             RegisterScreen(
-                onRegisterClick = {
+                onRegisterSuccess = {
                     navController.navigate(Screen.Home.route)
                 }
             )

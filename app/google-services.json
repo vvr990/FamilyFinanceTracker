@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "394629480580",
+    "project_id": "familyfinancetracker-429fa",
+    "storage_bucket": "familyfinancetracker-429fa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:394629480580:android:fabe5e236161b83d2982d1",
+        "android_client_info": {
+          "package_name": "com.example.familyfinancetracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUjr88HBncUxOz5sQ0W1sDhoggC099U90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
