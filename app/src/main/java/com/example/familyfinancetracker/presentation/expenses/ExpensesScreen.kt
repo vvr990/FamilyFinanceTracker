@@ -9,6 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import com.example.familyfinancetracker.data.model.Expense
+import com.example.familyfinancetracker.data.remote.FirestoreSource
+
+import androidx.compose.runtime.LaunchedEffect
+
 
 @Composable
 fun ExpensesScreen() {
@@ -17,8 +21,28 @@ fun ExpensesScreen() {
     var amount by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
 
+    var message by remember { mutableStateOf("") }
+
+    var editingExpense by remember {
+        mutableStateOf<Expense?>(null)
+    }
+
     val expenses = remember {
         mutableStateListOf<Expense>()
+    }
+
+    LaunchedEffect(Unit) {
+
+        FirestoreSource.getExpenses(
+            onSuccess = { firestoreExpenses ->
+
+                expenses.clear()
+                expenses.addAll(firestoreExpenses)
+            },
+            onError = {
+                println(it)
+            }
+        )
     }
 
     val totalExpense = expenses.sumOf {
@@ -74,23 +98,106 @@ fun ExpensesScreen() {
                         title.isBlank() ||
                         amount.isBlank() ||
                         category.isBlank()
-                    ) return@Button
+                    ) {
+                        message = "Please fill all fields"
+                        return@Button
+                    }
 
-                    expenses.add(
-                        Expense(
-                            id = expenses.size + 1,
+                    // UPDATE EXISTING EXPENSE
+                    if (editingExpense != null) {
+
+                        val updatedExpense = editingExpense!!.copy(
                             title = title,
                             amount = amount,
                             category = category
                         )
+
+                        FirestoreSource.updateExpense(
+                            expense = updatedExpense,
+
+                            onSuccess = {
+
+                                FirestoreSource.getExpenses(
+
+                                    onSuccess = { firestoreExpenses ->
+
+                                        expenses.clear()
+                                        expenses.addAll(firestoreExpenses)
+
+                                        title = ""
+                                        amount = ""
+                                        category = ""
+
+                                        editingExpense = null
+
+                                        message = "Expense Updated Successfully"
+                                    },
+
+                                    onError = {
+                                        message = it
+                                    }
+                                )
+                            },
+
+                            onError = {
+                                message = it
+                            }
+                        )
+
+                        return@Button
+                    }
+
+                    // ADD NEW EXPENSE
+                    val expense = Expense(
+                        id = expenses.size + 1,
+                        title = title,
+                        amount = amount,
+                        category = category
                     )
 
-                    title = ""
-                    amount = ""
-                    category = ""
+                    FirestoreSource.addExpense(
+                        expense = expense,
+
+                        onSuccess = {
+
+                            FirestoreSource.getExpenses(
+
+                                onSuccess = { firestoreExpenses ->
+
+                                    expenses.clear()
+                                    expenses.addAll(firestoreExpenses)
+
+                                    title = ""
+                                    amount = ""
+                                    category = ""
+
+                                    message = "Expense Saved Successfully"
+                                },
+
+                                onError = {
+                                    message = it
+                                }
+                            )
+                        },
+
+                        onError = {
+                            message = it
+                        }
+                    )
                 }
             ) {
-                Text("Add Expense")
+                Text(
+                    if (editingExpense == null)
+                        "Add Expense"
+                    else
+                        "Update Expense"
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (message.isNotEmpty()) {
+                Text(message)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -134,10 +241,37 @@ fun ExpensesScreen() {
 
                     Button(
                         onClick = {
-                            expenses.remove(expense)
+
+                            if (expense.documentId.isBlank()) {
+                                return@Button
+                            }
+
+                            FirestoreSource.deleteExpense(
+                                documentId = expense.documentId,
+                                onSuccess = {
+                                    expenses.remove(expense)
+                                },
+                                onError = {
+                                    println(it)
+                                }
+                            )
                         }
                     ) {
                         Text("Delete")
+                    }
+                    Button(
+                        onClick = {
+
+                            editingExpense = expense
+
+                            title = expense.title
+                            amount = expense.amount
+                            category = expense.category
+
+                            message = "Editing Expense..."
+                        }
+                    ) {
+                        Text("Edit")
                     }
                 }
             }

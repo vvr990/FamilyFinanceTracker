@@ -1,5 +1,7 @@
 package com.example.familyfinancetracker.presentation.home
 
+import androidx.compose.runtime.saveable.rememberSaveable
+
 import androidx.compose.material3.ExperimentalMaterial3Api
 
 import androidx.compose.foundation.layout.*
@@ -24,7 +26,7 @@ import androidx.navigation.NavController
 fun HomeScreen(
     navController: NavController) {
 
-    var selectedTab by remember {
+    var selectedTab by rememberSaveable {
         mutableStateOf(0)
     }
 
@@ -158,6 +160,8 @@ fun HomeScreen(
                 ) {
 
                     when (selectedTab) {
+
+
 
                         0 -> ExpensesScreen()
 

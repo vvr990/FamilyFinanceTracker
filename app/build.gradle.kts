@@ -47,11 +47,11 @@ dependencies {
 //    implementation(libs.room.ktx)
 //    ksp(libs.room.compiler)
 
-    implementation("com.google.firebase:firebase-auth:24.0.1")
-
     implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
 
     implementation("com.google.firebase:firebase-auth")
+
+    implementation("com.google.firebase:firebase-firestore")
 
     implementation("androidx.compose.material:material-icons-extended")
     implementation(platform(libs.androidx.compose.bom))

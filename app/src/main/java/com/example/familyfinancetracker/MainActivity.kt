@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import com.example.familyfinancetracker.navigation.AppNavigation
 import com.example.familyfinancetracker.ui.theme.FamilyFinanceTrackerTheme
 
+
+import com.google.firebase.firestore.FirebaseFirestore
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
