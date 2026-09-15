@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import com.google.firebase.auth.FirebaseAuth
+
 import androidx.navigation.NavController
 import com.example.familyfinancetracker.navigation.Screen
 
@@ -54,7 +56,15 @@ fun DrawerContent(
         }
 
         DrawerItem("Logout") {
-            navController.navigate(Screen.Login.route)
+
+            FirebaseAuth.getInstance().signOut()
+
+            navController.navigate(Screen.Login.route) {
+
+                popUpTo(0)
+
+                launchSingleTop = true
+            }
         }
     }
 }

@@ -11,6 +11,8 @@ import androidx.compose.ui.unit.dp
 import com.example.familyfinancetracker.data.model.Expense
 import com.example.familyfinancetracker.data.remote.FirestoreSource
 
+import com.example.familyfinancetracker.data.DashboardRefresh
+
 import androidx.compose.runtime.LaunchedEffect
 
 
@@ -116,6 +118,7 @@ fun ExpensesScreen() {
                             expense = updatedExpense,
 
                             onSuccess = {
+                                DashboardRefresh.triggerRefresh()
 
                                 FirestoreSource.getExpenses(
 
@@ -159,6 +162,7 @@ fun ExpensesScreen() {
                         expense = expense,
 
                         onSuccess = {
+                            DashboardRefresh.triggerRefresh()
 
                             FirestoreSource.getExpenses(
 
@@ -249,6 +253,7 @@ fun ExpensesScreen() {
                             FirestoreSource.deleteExpense(
                                 documentId = expense.documentId,
                                 onSuccess = {
+                                    DashboardRefresh.triggerRefresh()
                                     expenses.remove(expense)
                                 },
                                 onError = {

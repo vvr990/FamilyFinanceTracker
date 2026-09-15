@@ -4,6 +4,7 @@ import com.example.familyfinancetracker.data.model.Savings
 import com.example.familyfinancetracker.data.model.Income
 import com.example.familyfinancetracker.data.model.Expense
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.familyfinancetracker.data.model.FamilyMember
 
 object FirestoreSource {
 
@@ -305,6 +306,83 @@ object FirestoreSource {
                 }
 
                 onSuccess(total)
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun addFamilyMember(
+        familyMember: FamilyMember,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("familyMembers")
+            .add(familyMember)
+            .addOnSuccessListener { document ->
+
+                document.update(
+                    "documentId",
+                    document.id
+                )
+
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun getFamilyMembers(
+        onSuccess: (List<FamilyMember>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("familyMembers")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val familyMembers =
+                    result.toObjects(
+                        FamilyMember::class.java
+                    )
+
+                onSuccess(familyMembers)
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun updateFamilyMember(
+        familyMember: FamilyMember,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("familyMembers")
+            .document(familyMember.documentId)
+            .set(familyMember)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun deleteFamilyMember(
+        documentId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("familyMembers")
+            .document(documentId)
+            .delete()
+            .addOnSuccessListener {
+                onSuccess()
             }
             .addOnFailureListener {
                 onError(it.message ?: "Error")

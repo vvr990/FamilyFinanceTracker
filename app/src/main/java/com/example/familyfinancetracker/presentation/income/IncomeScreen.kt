@@ -11,6 +11,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.LaunchedEffect
 import com.example.familyfinancetracker.data.remote.FirestoreSource
 
+import com.example.familyfinancetracker.data.DashboardRefresh
+
 import com.example.familyfinancetracker.data.model.Income
 
 @Composable
@@ -125,6 +127,7 @@ fun IncomeScreen() {
                             income = income,
 
                             onSuccess = {
+                                DashboardRefresh.triggerRefresh()
 
                                 FirestoreSource.getIncome(
 
@@ -163,6 +166,7 @@ fun IncomeScreen() {
                             income = updatedIncome,
 
                             onSuccess = {
+                                DashboardRefresh.triggerRefresh()
 
                                 val index = incomes.indexOfFirst {
                                     it.documentId == updatedIncome.documentId
@@ -243,6 +247,7 @@ fun IncomeScreen() {
                                 documentId = income.documentId,
 
                                 onSuccess = {
+                                    DashboardRefresh.triggerRefresh()
                                     incomes.remove(income)
                                 },
 

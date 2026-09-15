@@ -5,10 +5,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
+
+import androidx.compose.runtime.LaunchedEffect
+
 import com.example.familyfinancetracker.data.model.FamilyMember
+import com.example.familyfinancetracker.data.remote.FirestoreSource
 
 @Composable
 fun FamilyMembersScreen() {
@@ -18,66 +22,103 @@ fun FamilyMembersScreen() {
     var relation by remember { mutableStateOf("") }
     var contribution by remember { mutableStateOf("") }
 
-    val members = remember {
+    var message by remember { mutableStateOf("") }
+
+    var editingMember by remember {
+        mutableStateOf<FamilyMember?>(null)
+    }
+
+    val familyMembers = remember {
         mutableStateListOf<FamilyMember>()
     }
 
+    LaunchedEffect(Unit) {
+
+        FirestoreSource.getFamilyMembers(
+
+            onSuccess = { firestoreMembers ->
+
+                familyMembers.clear()
+                familyMembers.addAll(firestoreMembers)
+            },
+
+            onError = {
+                println(it)
+            }
+        )
+    }
+
+    val totalContribution = familyMembers.sumOf {
+        it.contribution.toIntOrNull() ?: 0
+    }
+
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = 24.dp)
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
 
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth(0.9f)
+                .padding(16.dp)
         ) {
+
+        item {
 
             Text(
                 text = "Family Members",
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineSmall
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                onValueChange = {
+                    name = it
+                },
+                label = {
+                    Text("Name")
+                },
+                modifier = Modifier.fillMaxWidth(0.9f)            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = age,
-                onValueChange = { age = it },
-                label = { Text("Age") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                onValueChange = {
+                    age = it
+                },
+                label = {
+                    Text("Age")
+                },
+                modifier = Modifier.fillMaxWidth(0.9f)            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = relation,
-                onValueChange = { relation = it },
-                label = { Text("Relation") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                onValueChange = {
+                    relation = it
+                },
+                label = {
+                    Text("Relation")
+                },
+                modifier = Modifier.fillMaxWidth(0.9f)            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = contribution,
-                onValueChange = { contribution = it },
-                label = { Text("Monthly Contribution") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                onValueChange = {
+                    contribution = it
+                },
+                label = {
+                    Text("Contribution")
+                },
+                modifier = Modifier.fillMaxWidth(0.9f)            )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Button(
                 onClick = {
@@ -88,96 +129,220 @@ fun FamilyMembersScreen() {
                         relation.isBlank() ||
                         contribution.isBlank()
                     ) {
+                        message = "Please fill all fields"
                         return@Button
                     }
 
-                    members.add(
-                        FamilyMember(
-                            id = members.size + 1,
-                            name = name,
-                            age = age,
-                            relation = relation,
-                            contribution = contribution
+                    // UPDATE
+                    if (editingMember != null) {
+
+                        val updatedMember =
+                            editingMember!!.copy(
+                                name = name,
+                                age = age,
+                                relation = relation,
+                                contribution = contribution
+                            )
+
+                        FirestoreSource.updateFamilyMember(
+                            familyMember = updatedMember,
+
+                            onSuccess = {
+
+                                FirestoreSource.getFamilyMembers(
+
+                                    onSuccess = { firestoreMembers ->
+
+                                        familyMembers.clear()
+                                        familyMembers.addAll(
+                                            firestoreMembers
+                                        )
+
+                                        editingMember = null
+
+                                        name = ""
+                                        age = ""
+                                        relation = ""
+                                        contribution = ""
+
+                                        message =
+                                            "Member Updated Successfully"
+                                    },
+
+                                    onError = {
+                                        message = it
+                                    }
+                                )
+                            },
+
+                            onError = {
+                                message = it
+                            }
                         )
+
+                        return@Button
+                    }
+
+                    // ADD
+                    val member = FamilyMember(
+                        id = familyMembers.size + 1,
+                        name = name,
+                        age = age,
+                        relation = relation,
+                        contribution = contribution
                     )
 
-                    name = ""
-                    age = ""
-                    relation = ""
-                    contribution = ""
-                },
-                modifier = Modifier.fillMaxWidth()
+                    FirestoreSource.addFamilyMember(
+                        familyMember = member,
+
+                        onSuccess = {
+
+                            FirestoreSource.getFamilyMembers(
+
+                                onSuccess = { firestoreMembers ->
+
+                                    familyMembers.clear()
+                                    familyMembers.addAll(
+                                        firestoreMembers
+                                    )
+
+                                    name = ""
+                                    age = ""
+                                    relation = ""
+                                    contribution = ""
+
+                                    message =
+                                        "Member Added Successfully"
+                                },
+
+                                onError = {
+                                    message = it
+                                }
+                            )
+                        },
+
+                        onError = {
+                            message = it
+                        }
+                    )
+                }
             ) {
-                Text("Add Member")
+
+                Text(
+                    if (editingMember == null)
+                        "Add Member"
+                    else
+                        "Update Member"
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            val totalContribution = members.sumOf {
-                it.contribution.toIntOrNull() ?: 0
+            if (message.isNotEmpty()) {
+                Text(message)
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = "Total Contribution: ₹$totalContribution",
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            if (members.isNotEmpty()) {
+            Text(
+                text = "Members Count: ${familyMembers.size}",
+                style = MaterialTheme.typography.titleMedium
+            )
 
-                LazyColumn(
-                    modifier = Modifier.height(250.dp)
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        items(familyMembers.reversed()) { member ->
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(12.dp)
                 ) {
 
-                    items(members) { member ->
+                    Text("Name: ${member.name}")
 
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 6.dp)
-                        ) {
+                    Text("Age: ${member.age}")
 
-                            Column(
-                                modifier = Modifier.padding(16.dp)
+                    Text("Relation: ${member.relation}")
+
+                    Text(
+                        "Contribution: ₹${member.contribution}"
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    Button(
+                        onClick = {
+
+                            if (
+                                member.documentId.isBlank()
                             ) {
-
-                                Text("Name: ${member.name}")
-                                Text("Age: ${member.age}")
-                                Text("Relation: ${member.relation}")
-                                Text("Contribution: ₹${member.contribution}")
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Row {
-
-                                    TextButton(
-                                        onClick = {
-                                            members.remove(member)
-                                        }
-                                    ) {
-                                        Text("Delete")
-                                    }
-
-                                    TextButton(
-                                        onClick = {
-
-                                            name = member.name
-                                            age = member.age
-                                            relation = member.relation
-                                            contribution = member.contribution
-
-                                            members.remove(member)
-                                        }
-                                    ) {
-                                        Text("Edit")
-                                    }
-                                }
+                                return@Button
                             }
+
+                            FirestoreSource.deleteFamilyMember(
+                                documentId =
+                                    member.documentId,
+
+                                onSuccess = {
+                                    familyMembers.remove(
+                                        member
+                                    )
+                                },
+
+                                onError = {
+                                    println(it)
+                                }
+                            )
                         }
+                    ) {
+                        Text("Delete")
+                    }
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+
+                    Button(
+                        onClick = {
+
+                            editingMember = member
+
+                            name = member.name
+                            age = member.age
+                            relation = member.relation
+                            contribution =
+                                member.contribution
+
+                            message =
+                                "Editing Member..."
+                        }
+                    ) {
+                        Text("Edit")
                     }
                 }
             }
         }
+
+        item {
+            Spacer(
+                modifier = Modifier.height(100.dp)
+            )
+        }
     }
+}
 }

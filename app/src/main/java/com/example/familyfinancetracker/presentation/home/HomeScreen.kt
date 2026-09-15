@@ -19,6 +19,8 @@ import com.example.familyfinancetracker.presentation.savings.SavingsScreen
 import com.example.familyfinancetracker.ui.components.DrawerContent
 import com.example.familyfinancetracker.ui.components.SummaryCard
 
+import com.example.familyfinancetracker.data.DashboardRefresh
+
 import androidx.compose.runtime.LaunchedEffect
 import com.example.familyfinancetracker.data.remote.FirestoreSource
 
@@ -57,7 +59,9 @@ fun HomeScreen(
 
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
+    val refreshTrigger by DashboardRefresh.refresh.collectAsState()
+
+    LaunchedEffect(refreshTrigger) {
 
         FirestoreSource.getTotalIncome(
             onSuccess = {

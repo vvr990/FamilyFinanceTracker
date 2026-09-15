@@ -8,7 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.LaunchedEffect
+
+import com.example.familyfinancetracker.data.DashboardRefresh
 
 import com.example.familyfinancetracker.data.model.Savings
 import com.example.familyfinancetracker.data.remote.FirestoreSource
@@ -127,6 +131,7 @@ fun SavingsScreen() {
                             savings = savings,
 
                             onSuccess = {
+                                DashboardRefresh.triggerRefresh()
 
                                 FirestoreSource.getSavings(
 
@@ -166,6 +171,7 @@ fun SavingsScreen() {
                             savings = updatedSavings,
 
                             onSuccess = {
+                                DashboardRefresh.triggerRefresh()
 
                                 val index =
                                     savingsList.indexOfFirst {
@@ -263,6 +269,7 @@ fun SavingsScreen() {
                                     savings.documentId,
 
                                 onSuccess = {
+                                    DashboardRefresh.triggerRefresh()
                                     savingsList.remove(
                                         savings
                                     )

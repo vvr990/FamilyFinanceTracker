@@ -14,6 +14,7 @@ import com.example.familyfinancetracker.presentation.profile.ProfileScreen
 import com.example.familyfinancetracker.presentation.recurring.RecurringExpensesScreen
 import com.example.familyfinancetracker.presentation.payments.UpcomingPaymentsScreen
 import com.example.familyfinancetracker.presentation.settings.SettingsScreen
+import com.example.familyfinancetracker.presentation.familymembers.FamilyMembersScreen
 
 @Composable
 fun AppNavigation() {
