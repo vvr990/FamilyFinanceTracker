@@ -19,6 +19,9 @@ import com.example.familyfinancetracker.presentation.savings.SavingsScreen
 import com.example.familyfinancetracker.ui.components.DrawerContent
 import com.example.familyfinancetracker.ui.components.SummaryCard
 
+import androidx.compose.runtime.LaunchedEffect
+import com.example.familyfinancetracker.data.remote.FirestoreSource
+
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,6 +30,18 @@ fun HomeScreen(
     navController: NavController) {
 
     var selectedTab by rememberSaveable {
+        mutableStateOf(0)
+    }
+
+    var totalIncome by remember {
+        mutableStateOf(0)
+    }
+
+    var totalExpenses by remember {
+        mutableStateOf(0)
+    }
+
+    var totalSavings by remember {
         mutableStateOf(0)
     }
 
@@ -41,6 +56,36 @@ fun HomeScreen(
     )
 
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+
+        FirestoreSource.getTotalIncome(
+            onSuccess = {
+                totalIncome = it
+            },
+            onError = {
+                println(it)
+            }
+        )
+
+        FirestoreSource.getTotalExpenses(
+            onSuccess = {
+                totalExpenses = it
+            },
+            onError = {
+                println(it)
+            }
+        )
+
+        FirestoreSource.getTotalSavings(
+            onSuccess = {
+                totalSavings = it
+            },
+            onError = {
+                println(it)
+            }
+        )
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -117,17 +162,17 @@ fun HomeScreen(
 
                     SummaryCard(
                         title = "Income",
-                        amount = "₹95,000"
+                        amount = "₹$totalIncome"
                     )
 
                     SummaryCard(
                         title = "Expenses",
-                        amount = "₹52,000"
+                        amount = "₹$totalExpenses"
                     )
 
                     SummaryCard(
                         title = "Savings",
-                        amount = "₹43,000"
+                        amount = "₹$totalSavings"
                     )
                 }
 

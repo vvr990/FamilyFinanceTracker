@@ -1,5 +1,7 @@
 package com.example.familyfinancetracker.data.remote
 
+import com.example.familyfinancetracker.data.model.Savings
+import com.example.familyfinancetracker.data.model.Income
 import com.example.familyfinancetracker.data.model.Expense
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -81,4 +83,233 @@ object FirestoreSource {
                 onError(it.message ?: "Error")
             }
     }
+
+    fun addIncome(
+        income: Income,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("income")
+            .add(income)
+            .addOnSuccessListener { document ->
+
+                document.update(
+                    "documentId",
+                    document.id
+                )
+
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun getIncome(
+        onSuccess: (List<Income>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("income")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val incomeList = result.toObjects(
+                    Income::class.java
+                )
+
+                onSuccess(incomeList)
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun updateIncome(
+        income: Income,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("income")
+            .document(income.documentId)
+            .set(income)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun deleteIncome(
+        documentId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("income")
+            .document(documentId)
+            .delete()
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+
+    fun addSavings(
+        savings: Savings,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("savings")
+            .add(savings)
+            .addOnSuccessListener { document ->
+
+                document.update(
+                    "documentId",
+                    document.id
+                )
+
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun getSavings(
+        onSuccess: (List<Savings>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("savings")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val savingsList = result.documents.map { document ->
+
+                    Savings(
+                        documentId = document.id,
+                        id = document.getLong("id")?.toInt() ?: 0,
+                        title = document.getString("title") ?: "",
+                        amount = document.getString("amount") ?: "",
+                        goal = document.getString("goal") ?: ""
+                    )
+                }
+
+                onSuccess(savingsList)
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun updateSavings(
+        savings: Savings,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("savings")
+            .document(savings.documentId)
+            .set(savings)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun deleteSavings(
+        documentId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("savings")
+            .document(documentId)
+            .delete()
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+
+    fun getTotalExpenses(
+        onSuccess: (Int) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("expenses")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val total = result.documents.sumOf {
+
+                    it.getString("amount")
+                        ?.toIntOrNull() ?: 0
+                }
+
+                onSuccess(total)
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun getTotalIncome(
+        onSuccess: (Int) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("income")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val total = result.documents.sumOf {
+
+                    it.getString("amount")
+                        ?.toIntOrNull() ?: 0
+                }
+
+                onSuccess(total)
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+    fun getTotalSavings(
+        onSuccess: (Int) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        db.collection("savings")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val total = result.documents.sumOf {
+
+                    it.getString("amount")
+                        ?.toIntOrNull() ?: 0
+                }
+
+                onSuccess(total)
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Error")
+            }
+    }
+
+
 }
