@@ -244,20 +244,87 @@ fun FamilyMembersScreen() {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = "Total Contribution: ₹$totalContribution",
-                style = MaterialTheme.typography.titleMedium
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Card(
+                    modifier = Modifier.weight(1f)
+                ) {
 
-            Text(
-                text = "Members Count: ${familyMembers.size}",
-                style = MaterialTheme.typography.titleMedium
-            )
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
 
-            Spacer(modifier = Modifier.height(12.dp))
+                        Text("👨 Members")
+
+                        Text(
+                            text = "${familyMembers.size}",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    }
+                }
+
+                Card(
+                    modifier = Modifier.weight(1f)
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text("💰 Contribution")
+
+                        Text(
+                            text = "₹$totalContribution",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
+
+
+            if (familyMembers.isEmpty()) {
+
+                item {
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp)
+                    ) {
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+
+                            horizontalAlignment =
+                                Alignment.CenterHorizontally
+                        ) {
+
+                            Text(
+                                text = "👨‍👩‍👧‍👦 No Family Members Added",
+                                style =
+                                    MaterialTheme.typography.titleMedium
+                            )
+
+                            Spacer(
+                                modifier = Modifier.height(8.dp)
+                            )
+
+                            Text(
+                                text =
+                                    "Add family members to manage finances together."
+                            )
+                        }
+                    }
+                }
+            }
 
         items(familyMembers.reversed()) { member ->
 
@@ -268,21 +335,32 @@ fun FamilyMembersScreen() {
             ) {
 
                 Column(
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.padding(16.dp)
                 ) {
 
-                    Text("Name: ${member.name}")
-
-                    Text("Age: ${member.age}")
-
-                    Text("Relation: ${member.relation}")
-
                     Text(
-                        "Contribution: ₹${member.contribution}"
+                        text = "👤 ${member.name}",
+                        style = MaterialTheme.typography.titleMedium
                     )
 
                     Spacer(
-                        modifier = Modifier.height(8.dp)
+                        modifier = Modifier.height(4.dp)
+                    )
+
+                    Text(
+                        text = "${member.relation} • ${member.age} Years"
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(4.dp)
+                    )
+
+                    Text(
+                        text = "Contribution: ₹${member.contribution}"
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(12.dp)
                     )
 
                     Button(

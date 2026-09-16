@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-import com.example.familyfinancetracker.presentation.auth.LoginScreen
+import com.example.familyfinancetracker.presentation.auth.login.LoginScreen
 import com.example.familyfinancetracker.presentation.auth.RegisterScreen
 import com.example.familyfinancetracker.presentation.home.HomeScreen
 
@@ -14,7 +14,6 @@ import com.example.familyfinancetracker.presentation.profile.ProfileScreen
 import com.example.familyfinancetracker.presentation.recurring.RecurringExpensesScreen
 import com.example.familyfinancetracker.presentation.payments.UpcomingPaymentsScreen
 import com.example.familyfinancetracker.presentation.settings.SettingsScreen
-import com.example.familyfinancetracker.presentation.familymembers.FamilyMembersScreen
 
 @Composable
 fun AppNavigation() {
@@ -70,7 +69,9 @@ fun AppNavigation() {
         }
 
         composable(Screen.Settings.route) {
-            SettingsScreen()
+            SettingsScreen(
+                navController = navController
+            )
         }
     }
 }

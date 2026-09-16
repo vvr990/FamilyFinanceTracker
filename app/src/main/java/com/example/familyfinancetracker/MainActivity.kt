@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.familyfinancetracker.navigation.AppNavigation
 import com.example.familyfinancetracker.ui.theme.FamilyFinanceTrackerTheme
-
+import androidx.compose.runtime.Composable
 
 import com.google.firebase.firestore.FirebaseFirestore
 class MainActivity : ComponentActivity() {

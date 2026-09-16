@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 
 import androidx.compose.runtime.LaunchedEffect
 import com.example.familyfinancetracker.data.remote.FirestoreSource
@@ -214,6 +215,37 @@ fun IncomeScreen() {
             )
         }
 
+        if (incomes.isEmpty()) {
+
+            item {
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                ) {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Text(
+                            text = "💵 No Income Added",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Add income records to track earnings."
+                        )
+                    }
+                }
+            }
+        }
         items(incomes.reversed()) { income ->
 
             Card(
